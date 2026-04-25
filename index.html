@@ -3,149 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTINEL-X | ELITE STORE</title>
+    <title>SENTINEL-X | DIGITAL CARD SYSTEM</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00ff41; --bg: #050505; --card: #0d0d0d; }
-        body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; text-align: center; }
-        .glitch { font-family: 'Orbitron'; font-size: 2.5rem; color: var(--neon); text-shadow: 0 0 10px var(--neon); margin: 30px 0; }
-        .container { max-width: 1000px; margin: auto; padding: 20px; }
+        :root { --neon: #00ff41; --bg: #050505; --card-grad: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%); }
+        body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; }
+        .container { max-width: 1000px; margin: auto; padding: 20px; text-align: center; }
         
-        /* لوحة التحكم */
-        .stats-box { background: var(--card); border: 2px solid var(--neon); border-radius: 20px; padding: 25px; margin-bottom: 30px; }
-        .pts-val { font-family: 'Orbitron'; font-size: 3.5rem; color: var(--neon); display: block; }
+        /* تصميم البطاقة الإلكترونية */
+        .e-card { 
+            background: var(--card-grad); border: 2px solid var(--neon); border-radius: 20px; 
+            padding: 25px; width: 350px; margin: 20px auto; position: relative; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,255,65,0.2); text-align: left; font-family: 'Orbitron';
+        }
+        .e-card::before { content: "SENTINEL-X MEMBER"; position: absolute; top: 10px; right: 15px; font-size: 0.6rem; color: var(--neon); opacity: 0.5; }
+        .card-label { font-size: 0.7rem; color: #888; display: block; margin-top: 10px; }
+        .card-val { color: #fff; font-size: 1.1rem; letter-spacing: 2px; }
+        .card-points { font-size: 2.5rem; color: var(--neon); display: block; margin-top: 15px; text-align: center; }
+
+        /* الأزرار والمتجر */
+        .btn { background: var(--neon); color: #000; padding: 12px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin: 5px; font-family: 'Cairo'; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 40px; }
+        .item-card { background: #0d0d0d; border: 1px solid #222; border-radius: 15px; overflow: hidden; padding-bottom: 15px; }
+        .item-card img { width: 100%; height: 150px; object-fit: cover; }
         
-        .btn { background: var(--neon); color: #000; padding: 12px 25px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; margin: 5px; font-family: 'Cairo'; }
-        .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
-        .btn-sec { background: transparent; color: var(--neon); border: 1px solid var(--neon); }
-
-        /* المنتجات */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border-radius: 15px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
-        .card:hover { border-color: var(--neon); }
-        .card img { width: 100%; height: 160px; object-fit: cover; }
-        .price { color: var(--neon); font-family: 'Orbitron'; font-size: 1.3rem; display: block; margin: 10px 0; }
-
-        /* منطقة المشتريات */
-        .my-orders { background: #111; border-radius: 10px; padding: 15px; margin-top: 30px; display: none; text-align: right; }
-        .order-item { border-bottom: 1px dashed #333; padding: 10px 0; color: #00ff41; font-size: 0.9rem; }
+        /* نافذة الشراء (Telegram Info) */
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid var(--neon); padding: 30px; z-index: 1000; border-radius: 15px; width: 90%; max-width: 400px; }
+        .modal input { width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 class="glitch">SENTINEL-X STORE</h1>
+    <h1 style="font-family: 'Orbitron'; color: var(--neon);">SENTINEL-X TERMINAL</h1>
 
-    <div class="stats-box">
-        <span style="color: #888;">CREDITS</span>
-        <span id="balance" class="pts-val">0</span>
+    <div class="e-card" id="userCard">
+        <span class="card-label">CARD HOLDER (EMAIL)</span>
+        <span class="card-val" id="dispEmail">loading...</span>
         
-        <button class="btn" onclick="claimDaily()">🎁 هدية يومية +150</button>
-        <button class="btn btn-sec" onclick="copyRef()">🔗 رابط الدعوة (+50)</button>
-        <button class="btn" onclick="toggleOrders()" style="background: #ffaa00; color: #000;">📂 مشترياتي</button>
+        <span class="card-label">CARD NUMBER</span>
+        <span class="card-val" id="dispID">XXXX-XXXX-XXXX</span>
+        
+        <span class="card-label">SECURITY CODE (PIN)</span>
+        <span class="card-val" id="dispPIN">****</span>
+        
+        <span class="card-points" id="balance">0</span>
+        <center><small style="color:var(--neon)">CREDITS</small></center>
     </div>
 
-    <div id="ordersList" class="my-orders">
-        <h3 style="color: #fff;">قائمة مشترياتك (روابط التحميل):</h3>
-        <div id="itemsContainer"></div>
-    </div>
+    <button class="btn" onclick="claimDaily()">🎁 مكافأة يومية</button>
+    <button class="btn" onclick="copyRef()">🔗 رابط الإحالة</button>
 
     <div class="grid" id="shop"></div>
 </div>
 
-<footer>
-    DEVELOPED BY <a href="https://t.me/wxl_e" style="color: var(--neon); text-decoration: none;">@wxl_e</a>
-</footer>
+<div id="buyModal" class="modal">
+    <h3>إتمام الشراء عبر Telegram</h3>
+    <p style="font-size: 0.8rem; color: #888;">سيتم إرسال المنتج إلى بوتك الخاص</p>
+    <input type="text" id="tgToken" placeholder="Bot Token (مثال: 7283...:AAH..)">
+    <input type="text" id="tgChatID" placeholder="Your Chat ID (مثال: 12345678)">
+    <input type="password" id="userPIN" placeholder="أدخل كود PIN الخاص ببطاقتك">
+    <button class="btn" id="confirmBtn" style="width: 100%;">تأكيد وإرسال للملف</button>
+    <button onclick="closeModal()" style="background:none; color:red; border:none; cursor:pointer; margin-top:10px;">إلغاء</button>
+</div>
 
 <script>
-    let points = parseInt(localStorage.getItem('wxl_pts')) || 0;
-    let lastClaim = localStorage.getItem('wxl_daily') || 0;
-    let myOrders = JSON.parse(localStorage.getItem('wxl_orders')) || [];
+    // --- المحرك الأساسي ---
+    let userData = JSON.parse(localStorage.getItem('wxl_user')) || null;
 
-    // قائمة المنتجات مع روابط تحميل حقيقية (مثال)
-    const products = [
-        {id: 1, name: "solx_wxle Framework", price: 150, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400", link: "https://t.me/wxl_e/download_solx"},
-        {id: 2, name: "IPGRAM Extractor", price: 60, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?w=400", link: "https://t.me/wxl_e/download_ipgram"},
-        {id: 3, name: "Trading Academy Pro", price: 400, img: "https://images.unsplash.com/photo-1611974717483-9b910c0c9cd9?w=400", link: "https://t.me/wxl_e/trading_course"},
-        {id: 4, name: "SENTINEL-X Key", price: 200, img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400", link: "https://t.me/wxl_e/sentinel_key"}
-    ];
+    if (!userData) {
+        const email = prompt("مرحباً بك! أدخل إيميلك لتوليد بطاقتك الإلكترونية:");
+        if (email) {
+            userData = {
+                email: email,
+                id: "SN-" + Math.floor(1000 + Math.random() * 9000) + "-" + Math.floor(1000 + Math.random() * 9000),
+                pin: Math.floor(1000 + Math.random() * 9000),
+                points: 0,
+                lastDaily: 0
+            };
+            localStorage.setItem('wxl_user', JSON.stringify(userData));
+        }
+    }
 
     function updateUI() {
-        document.getElementById('balance').innerText = points;
-        localStorage.setItem('wxl_pts', points);
-        renderOrders();
+        document.getElementById('dispEmail').innerText = userData.email;
+        document.getElementById('dispID').innerText = userData.id;
+        document.getElementById('dispPIN').innerText = userData.pin;
+        document.getElementById('balance').innerText = userData.points;
+        localStorage.setItem('wxl_user', JSON.stringify(userData));
     }
 
-    function buy(id, name, price, link) {
-        if (points < price) return alert("نقاطك لا تكفي!");
-        const email = prompt("أدخل إيميلك لتأكيد الشراء:");
-        if (!email || !email.includes("@")) return alert("إيميل غير صحيح!");
+    const products = [
+        {id: 1, name: "solx_wxle Framework", price: 150, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400"},
+        {id: 2, name: "Trading Academy Pro", price: 400, img: "https://images.unsplash.com/photo-1611974717483-9b910c0c9cd9?w=400"},
+        {id: 3, name: "SENTINEL-X Key", price: 200, img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400"}
+    ];
 
-        points -= price;
-        const key = "WXL-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-        
-        // حفظ في قائمة المشتريات
-        myOrders.push({ name, key, link, date: new Date().toLocaleDateString() });
-        localStorage.setItem('wxl_orders', JSON.stringify(myOrders));
-        
+    let activeProduct = null;
+
+    function openBuy(id) {
+        activeProduct = products.find(p => p.id === id);
+        if (userData.points < activeProduct.price) return alert("نقاط البطاقة لا تكفي!");
+        document.getElementById('buyModal').style.display = "block";
+    }
+
+    function closeModal() { document.getElementById('buyModal').style.display = "none"; }
+
+    document.getElementById('confirmBtn').onclick = async function() {
+        const token = document.getElementById('tgToken').value;
+        const chatID = document.getElementById('tgChatID').value;
+        const pin = document.getElementById('userPIN').value;
+
+        if (pin != userData.pin) return alert("كود PIN البطاقة غير صحيح!");
+        if (!token || !chatID) return alert("يرجى ملء معلومات التليغرام!");
+
+        // عملية الدفع
+        userData.points -= activeProduct.price;
         updateUI();
-        alert(`✅ تم الشراء!\nالمنتج: ${name}\nالمفتاح: ${key}\n\nيمكنك الآن الضغط على "مشترياتي" لتحميل الملف في أي وقت.`);
-    }
 
-    function renderOrders() {
-        const container = document.getElementById('itemsContainer');
-        container.innerHTML = "";
-        myOrders.forEach(order => {
-            container.innerHTML += `
-                <div class="order-item">
-                    📦 <b>${order.name}</b> | المفتاح: <code>${order.key}</code> | 
-                    <a href="${order.link}" target="_blank" style="color: white;">[تحميل الملف]</a>
-                </div>
-            `;
-        });
-    }
-
-    function toggleOrders() {
-        const div = document.getElementById('ordersList');
-        div.style.display = (div.style.display === "none" || div.style.display === "") ? "block" : "none";
+        // إرسال للمتلقي عبر Telegram API
+        const msg = `✅ طلب شراء جديد!\nالمنتج: ${activeProduct.name}\nالإيميل: ${userData.email}\nكود التفعيل: WXL-${Math.random().toString(36).substr(2,8).toUpperCase()}`;
+        
+        try {
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatID}&text=${encodeURIComponent(msg)}`);
+            alert("تم إرسال المنتج بنجاح إلى بوت التليغرام الخاص بك!");
+            closeModal();
+        } catch (e) {
+            alert("خطأ في الاتصال بالبوت، تأكد من الـ Token والـ ID");
+        }
     }
 
     function claimDaily() {
         const now = Date.now();
-        if (now - lastClaim < 86400000) return alert("عد لاحقاً!");
-        points += 150;
-        lastClaim = now;
-        localStorage.setItem('wxl_daily', lastClaim);
+        if (now - userData.lastDaily < 86400000) return alert("البطاقة مشحونة، انتظر 24 ساعة.");
+        userData.points += 150;
+        userData.lastDaily = now;
         updateUI();
-        alert("استلمت 150 نقطة!");
+        alert("تم شحن 150 نقطة في بطاقتك!");
     }
 
     function copyRef() {
-        const refLink = window.location.origin + window.location.pathname + "?ref=" + Math.floor(Math.random() * 1000);
-        navigator.clipboard.writeText(refLink);
-        alert("نسخ الرابط! شاركه لتربح 50 نقطة.");
+        const link = window.location.origin + window.location.pathname + "?ref=" + userData.pin;
+        navigator.clipboard.writeText(link);
+        alert("تم نسخ رابط الدعوة الخاص ببطاقتك!");
     }
 
     // بناء المتجر
     const shop = document.getElementById('shop');
     products.forEach(p => {
         shop.innerHTML += `
-            <div class="card">
+            <div class="item-card">
                 <img src="${p.img}">
-                <div style="padding:15px">
-                    <h3>${p.name}</h3>
-                    <span class="price">${p.price} PTS</span>
-                    <button class="btn" style="width:100%" onclick="buy(${p.id}, '${p.name}', ${p.price}, '${p.link}')">شراء الآن</button>
-                </div>
+                <h3>${p.name}</h3>
+                <span style="color:var(--neon)">${p.price} PTS</span><br>
+                <button class="btn" onclick="openBuy(${p.id})">استخدام البطاقة للشراء</button>
             </div>
         `;
     });
 
     // نظام الإحالة
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('ref') && !localStorage.getItem('ref_used')) {
-        points += 50;
-        localStorage.setItem('ref_used', 'true');
+    if (urlParams.has('ref') && !localStorage.getItem('ref_done')) {
+        userData.points += 50;
+        localStorage.setItem('ref_done', 'true');
     }
 
     updateUI();
