@@ -8,139 +8,146 @@
     <style>
         :root { --neon: #00ff41; --bg: #050505; --card: #0d0d0d; }
         body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; text-align: center; }
-        .glitch { font-family: 'Orbitron'; font-size: 2.5rem; color: var(--neon); text-shadow: 0 0 10px var(--neon); margin: 30px 0; letter-spacing: 3px; }
+        .glitch { font-family: 'Orbitron'; font-size: 2.5rem; color: var(--neon); text-shadow: 0 0 10px var(--neon); margin: 30px 0; }
         .container { max-width: 1000px; margin: auto; padding: 20px; }
         
-        /* لوحة النقاط */
-        .stats-box { background: var(--card); border: 2px solid var(--neon); border-radius: 20px; padding: 30px; margin-bottom: 40px; box-shadow: 0 0 30px rgba(0,255,65,0.1); }
-        .pts-val { font-family: 'Orbitron'; font-size: 4rem; color: var(--neon); display: block; line-height: 1; margin: 10px 0; }
+        /* لوحة التحكم */
+        .stats-box { background: var(--card); border: 2px solid var(--neon); border-radius: 20px; padding: 25px; margin-bottom: 30px; }
+        .pts-val { font-family: 'Orbitron'; font-size: 3.5rem; color: var(--neon); display: block; }
         
-        .btn { background: var(--neon); color: #000; padding: 14px 30px; border: none; border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s; margin: 10px 5px; font-family: 'Cairo'; text-transform: uppercase; }
-        .btn:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--neon); }
-        .btn-ref { background: transparent; color: var(--neon); border: 1px solid var(--neon); }
+        .btn { background: var(--neon); color: #000; padding: 12px 25px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; margin: 5px; font-family: 'Cairo'; }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
+        .btn-sec { background: transparent; color: var(--neon); border: 1px solid var(--neon); }
 
-        /* الشبكة والمنتجات */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        .card { background: var(--card); border-radius: 15px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.4s; position: relative; }
-        .card:hover { border-color: var(--neon); transform: translateY(-10px); }
-        .card img { width: 100%; height: 180px; object-fit: cover; border-bottom: 1px solid #222; filter: grayscale(30%); }
-        .card-content { padding: 20px; }
-        .card h3 { margin: 0; font-size: 1.2rem; color: #eee; }
-        .price { color: var(--neon); font-family: 'Orbitron'; font-size: 1.4rem; display: block; margin: 15px 0; }
+        /* المنتجات */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border-radius: 15px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
+        .card:hover { border-color: var(--neon); }
+        .card img { width: 100%; height: 160px; object-fit: cover; }
+        .price { color: var(--neon); font-family: 'Orbitron'; font-size: 1.3rem; display: block; margin: 10px 0; }
 
-        footer { margin-top: 80px; padding: 40px; border-top: 1px solid #111; font-family: 'Orbitron'; letter-spacing: 2px; }
+        /* منطقة المشتريات */
+        .my-orders { background: #111; border-radius: 10px; padding: 15px; margin-top: 30px; display: none; text-align: right; }
+        .order-item { border-bottom: 1px dashed #333; padding: 10px 0; color: #00ff41; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 class="glitch">SENTINEL-X SYSTEM</h1>
+    <h1 class="glitch">SENTINEL-X STORE</h1>
 
     <div class="stats-box">
-        <span style="color: #666; font-weight: bold;">AVAILABLE CREDITS</span>
+        <span style="color: #888;">CREDITS</span>
         <span id="balance" class="pts-val">0</span>
         
-        <button class="btn" onclick="claimDaily()">🎁 DAILY BONUS +150</button>
-        <button class="btn btn-ref" onclick="copyRef()">🔗 REFERRAL LINK (+50)</button>
+        <button class="btn" onclick="claimDaily()">🎁 هدية يومية +150</button>
+        <button class="btn btn-sec" onclick="copyRef()">🔗 رابط الدعوة (+50)</button>
+        <button class="btn" onclick="toggleOrders()" style="background: #ffaa00; color: #000;">📂 مشترياتي</button>
     </div>
 
-    <h2 style="color: var(--neon); text-align: right; border-right: 4px solid var(--neon); padding-right: 15px; margin-bottom: 30px;">المتجر المتكامل (أدوات وكورسات)</h2>
+    <div id="ordersList" class="my-orders">
+        <h3 style="color: #fff;">قائمة مشترياتك (روابط التحميل):</h3>
+        <div id="itemsContainer"></div>
+    </div>
+
     <div class="grid" id="shop"></div>
 </div>
 
 <footer>
-    SECURED BY <a href="https://t.me/wxl_e" style="color: var(--neon); text-decoration: none;">@wxl_e</a>
+    DEVELOPED BY <a href="https://t.me/wxl_e" style="color: var(--neon); text-decoration: none;">@wxl_e</a>
 </footer>
 
 <script>
-    // --- البيانات ---
     let points = parseInt(localStorage.getItem('wxl_pts')) || 0;
     let lastClaim = localStorage.getItem('wxl_daily') || 0;
+    let myOrders = JSON.parse(localStorage.getItem('wxl_orders')) || [];
 
+    // قائمة المنتجات مع روابط تحميل حقيقية (مثال)
     const products = [
-        {id: 1, name: "solx_wxle Framework", price: 150, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400"},
-        {id: 2, name: "IPGRAM Extractor", price: 60, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?w=400"},
-        {id: 3, name: "Trading Academy (0-100)", price: 400, img: "https://images.unsplash.com/photo-1611974717483-9b910c0c9cd9?w=400"},
-        {id: 4, name: "SENTINEL-X Private Key", price: 200, img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400"},
-        {id: 5, name: "RSS.DDOS.V3 Ultimate", price: 120, img: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400"},
-        {id: 6, name: "Zero-Day Exploit Course", price: 500, img: "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=400"},
-        {id: 7, name: "Python Automation Mastery", price: 250, img: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400"},
-        {id: 8, name: "CyberShield Toolkit", price: 100, img: "https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?w=400"},
-        {id: 9, name: "Web Pentesting Masterclass", price: 350, img: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400"}
+        {id: 1, name: "solx_wxle Framework", price: 150, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400", link: "https://t.me/wxl_e/download_solx"},
+        {id: 2, name: "IPGRAM Extractor", price: 60, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?w=400", link: "https://t.me/wxl_e/download_ipgram"},
+        {id: 3, name: "Trading Academy Pro", price: 400, img: "https://images.unsplash.com/photo-1611974717483-9b910c0c9cd9?w=400", link: "https://t.me/wxl_e/trading_course"},
+        {id: 4, name: "SENTINEL-X Key", price: 200, img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400", link: "https://t.me/wxl_e/sentinel_key"}
     ];
 
-    // --- الوظائف ---
     function updateUI() {
         document.getElementById('balance').innerText = points;
         localStorage.setItem('wxl_pts', points);
+        renderOrders();
+    }
+
+    function buy(id, name, price, link) {
+        if (points < price) return alert("نقاطك لا تكفي!");
+        const email = prompt("أدخل إيميلك لتأكيد الشراء:");
+        if (!email || !email.includes("@")) return alert("إيميل غير صحيح!");
+
+        points -= price;
+        const key = "WXL-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+        
+        // حفظ في قائمة المشتريات
+        myOrders.push({ name, key, link, date: new Date().toLocaleDateString() });
+        localStorage.setItem('wxl_orders', JSON.stringify(myOrders));
+        
+        updateUI();
+        alert(`✅ تم الشراء!\nالمنتج: ${name}\nالمفتاح: ${key}\n\nيمكنك الآن الضغط على "مشترياتي" لتحميل الملف في أي وقت.`);
+    }
+
+    function renderOrders() {
+        const container = document.getElementById('itemsContainer');
+        container.innerHTML = "";
+        myOrders.forEach(order => {
+            container.innerHTML += `
+                <div class="order-item">
+                    📦 <b>${order.name}</b> | المفتاح: <code>${order.key}</code> | 
+                    <a href="${order.link}" target="_blank" style="color: white;">[تحميل الملف]</a>
+                </div>
+            `;
+        });
+    }
+
+    function toggleOrders() {
+        const div = document.getElementById('ordersList');
+        div.style.display = (div.style.display === "none" || div.style.display === "") ? "block" : "none";
     }
 
     function claimDaily() {
         const now = Date.now();
-        if (now - lastClaim < 86400000) {
-            const h = Math.ceil((86400000 - (now - lastClaim)) / 3600000);
-            return alert(`النظام مغلق! عد بعد ${h} ساعة.`);
-        }
+        if (now - lastClaim < 86400000) return alert("عد لاحقاً!");
         points += 150;
         lastClaim = now;
         localStorage.setItem('wxl_daily', lastClaim);
         updateUI();
-        alert("مبروك! تمت إضافة 150 نقطة لحسابك.");
-    }
-
-    function buy(id, name, price) {
-        if (points < price) return alert("رصيدك غير كافٍ!");
-        const email = prompt("أدخل إيميلك لاستلام رابط التحميل:");
-        if (!email || !email.includes("@")) return alert("الإيميل غير صحيح!");
-
-        points -= price;
-        updateUI();
-        const key = "WXL-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-        
-        // عرض فوري للمنتج
-        alert(`✅ مبروك يا بطل!\n\nالمنتج: ${name}\nالمفتاح: ${key}\nرابط التحميل: https://github.com/Kolkof12/files/raw/main/tool.zip\n\nتم إرسال نسخة أيضاً إلى: ${email}`);
+        alert("استلمت 150 نقطة!");
     }
 
     function copyRef() {
-        const myId = "u" + Math.floor(Math.random() * 999);
-        const refLink = window.location.origin + window.location.pathname + "?ref=" + myId;
+        const refLink = window.location.origin + window.location.pathname + "?ref=" + Math.floor(Math.random() * 1000);
         navigator.clipboard.writeText(refLink);
-        alert("تم نسخ رابط الدعوة! ستحصل على 50 نقطة بمجرد دخول أي شخص.");
+        alert("نسخ الرابط! شاركه لتربح 50 نقطة.");
     }
 
-    // --- نظام الإحالة المصلح ---
-    function checkReferral() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const ref = urlParams.get('ref');
-        
-        if (ref) {
-            // التحقق إذا كان المستخدم قد حصل على نقاط من هذا الرابط من قبل
-            if (localStorage.getItem('last_ref') !== ref) {
-                points += 50;
-                localStorage.setItem('last_ref', ref);
-                updateUI();
-                alert("لقد حصلت على 50 نقطة هدية من رابط الدعوة!");
-            }
-        }
-    }
-
-    // --- بناء المتجر ---
+    // بناء المتجر
     const shop = document.getElementById('shop');
     products.forEach(p => {
         shop.innerHTML += `
             <div class="card">
-                <img src="${p.img}" alt="${p.name}">
-                <div class="card-content">
+                <img src="${p.img}">
+                <div style="padding:15px">
                     <h3>${p.name}</h3>
                     <span class="price">${p.price} PTS</span>
-                    <button class="btn" style="width:100%" onclick="buy(${p.id}, '${p.name}', ${p.price})">ACCESS NOW</button>
+                    <button class="btn" style="width:100%" onclick="buy(${p.id}, '${p.name}', ${p.price}, '${p.link}')">شراء الآن</button>
                 </div>
             </div>
         `;
     });
 
-    // تشغيل عند التحميل
-    checkReferral();
+    // نظام الإحالة
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('ref') && !localStorage.getItem('ref_used')) {
+        points += 50;
+        localStorage.setItem('ref_used', 'true');
+    }
+
     updateUI();
 </script>
 </body>
