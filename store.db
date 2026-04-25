@@ -1,0 +1,44 @@
+import sqlite3
+
+def create_database():
+    # إنشاء اتصال بقاعدة البيانات (سيتم إنشاء الملف إذا لم يكن موجوداً)
+    conn = sqlite3.connect('store.db')
+    cursor = conn.cursor()
+
+    # 1. جدول المستخدمين (لحفظ النقاط وروابط الإحالة)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            points INTEGER DEFAULT 0,
+            referral_code TEXT UNIQUE
+        )
+    ''')
+
+    # 2. جدول المنتجات (الأدوات والكورسات)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            category TEXT, -- (Tools, Courses, Accounts)
+            price INTEGER NOT NULL
+        )
+    ''')
+
+    # 3. جدول المخزون (تفاصيل الحسابات أو روابط التحميل)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS inventory (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id INTEGER,
+            item_details TEXT, -- (الإيميل والباسورد أو رابط الكورس)
+            is_sold BOOLEAN DEFAULT 0,
+            FOREIGN KEY (product_id) REFERENCES products (id)
+        )
+    ''')
+
+    conn.commit()
+    conn.close()
+    print("✅ تم إنشاء قاعدة البيانات بنجاح!")
+
+if __name__ == "__main__":
+    create_database()
