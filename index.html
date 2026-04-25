@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTINEL-X | WXL-E STORE</title>
+    <title>SENTINEL-X | STORE</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00ff41; --bg: #050505; --card: #0d0d0d; }
         body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; text-align: center; }
         .glitch { font-family: 'Orbitron'; font-size: 2.5rem; color: var(--neon); text-shadow: 0 0 10px var(--neon); margin: 30px 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
-        .stats-box { background: var(--card); border: 1px solid var(--neon); border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 0 20px rgba(0,255,65,0.1); }
+        .stats-box { background: var(--card); border: 1px solid var(--neon); border-radius: 15px; padding: 25px; margin-bottom: 30px; }
         .pts-val { font-family: 'Orbitron'; font-size: 3.5rem; color: var(--neon); display: block; }
-        .btn { background: var(--neon); color: #000; padding: 12px 25px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; margin: 10px 5px; }
+        .btn { background: var(--neon); color: #000; padding: 12px 25px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; margin: 10px 5px; font-family: 'Cairo'; }
         .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
-        .btn-daily { background: #fff; border: 2px solid var(--neon); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #222; transition: 0.3s; }
-        .card:hover { border-color: var(--neon); }
         .price { color: var(--neon); font-family: 'Orbitron'; font-size: 1.2rem; display: block; margin: 10px 0; }
         footer { margin-top: 50px; padding: 30px; opacity: 0.6; font-family: 'Orbitron'; border-top: 1px solid #111; }
     </style>
@@ -31,10 +29,8 @@
         <span style="color: #888;">MY CREDITS</span>
         <span id="balance" class="pts-val">0</span>
         
-        <button class="btn btn-daily" onclick="claimDaily()">🎁 هدية 150 نقطة</button>
+        <button class="btn" onclick="claimDaily()" style="background: #fff;">🎁 هدية 150 نقطة</button>
         <button class="btn" onclick="copyRef()">🔗 رابط الدعوة (+50)</button>
-        
-        <p id="msg" style="font-size: 0.8rem; color: var(--neon); margin-top: 10px;"></p>
     </div>
 
     <div class="grid" id="shop"></div>
@@ -45,7 +41,6 @@
 </footer>
 
 <script>
-    // --- إعدادات النظام ---
     let points = parseInt(localStorage.getItem('wxl_pts')) || 0;
     let lastClaim = localStorage.getItem('wxl_daily') || 0;
 
@@ -53,16 +48,16 @@
         {id: 1, name: "solx_wxle Framework", price: 150},
         {id: 2, name: "IPGRAM Extractor", price: 60},
         {id: 3, name: "Trading Academy Pro", price: 400},
-        {id: 4, name: "CyberShield Tools", price: 100}
+        {id: 4, name: "SENTINEL-X Key", price: 200},
+        {id: 5, name: "RSS.DDOS.V3", price: 120},
+        {id: 6, name: "Zero-Day Exploit Course", price: 500}
     ];
 
-    // --- وظائف النظام ---
     function updateUI() {
         document.getElementById('balance').innerText = points;
         localStorage.setItem('wxl_pts', points);
     }
 
-    // الهدية اليومية
     function claimDaily() {
         const now = Date.now();
         if (now - lastClaim < 86400000) {
@@ -73,36 +68,46 @@
         lastClaim = now;
         localStorage.setItem('wxl_daily', lastClaim);
         updateUI();
-        alert("مبروك! استلمت 150 نقطة.");
+        alert("مبروك! استلمت 150 نقطة هدية.");
     }
 
-    // نظام الإحالة (سهل جداً)
-    function checkReferral() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('ref') && !localStorage.getItem('ref_used')) {
-            points += 50;
-            localStorage.setItem('ref_used', 'true');
-            updateUI();
-            alert("شكراً لدخولك عبر الرابط! حصلت على 50 نقطة.");
+    function buy(id, name, price) {
+        if (points < price) return alert("نقاطك لا تكفي لهذا المنتج!");
+
+        // طلب الإيميل عند الشراء
+        const email = prompt("يرجى إدخال بريدك الإلكتروني لإرسال ملف الأداة إليه:");
+        
+        if (!email || !email.includes("@")) {
+            return alert("يجب إدخال إيميل صحيح لإتمام العملية!");
         }
+
+        points -= price;
+        updateUI();
+
+        // توليد كود عشوائي للمنتج
+        const key = "WXL-" + Math.random().toString(36).substr(2, 10).toUpperCase();
+        
+        alert(`✅ تمت العملية بنجاح!\n\nالمنتج: ${name}\nالإيميل: ${email}\nالمفتاح الخاص بك: ${key}\n\nسيتم إرسال رابط تحميل الملف إلى بريدك خلال دقائق.`);
+        
+        // ملاحظة: بما أنه لا يوجد سيرفر، سنقوم بطباعة العملية في الكونسول لكي تراها أنت (اختياري)
+        console.log(`طلب شراء جديد: ${name} من قبل ${email}`);
     }
 
     function copyRef() {
-        const refLink = window.location.origin + window.location.pathname + "?ref=user" + Math.floor(Math.random() * 1000);
+        const refLink = window.location.origin + window.location.pathname + "?ref=" + Math.floor(Math.random() * 9999);
         navigator.clipboard.writeText(refLink);
-        alert("تم نسخ رابط الدعوة! أرسله لأصدقائك.");
+        alert("تم نسخ رابط الدعوة! ستحصل على 50 نقطة لكل شخص يدخل.");
     }
 
-    // الشراء
-    function buy(id, name, price) {
-        if (points < price) return alert("نقاطك لا تكفي!");
-        points -= price;
-        updateUI();
-        const key = "WXL-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-        alert(`تم الشراء بنجاح!\nالأداة: ${name}\nالمفتاح: ${key}`);
+    function checkRef() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('ref') && !localStorage.getItem('ref_done')) {
+            points += 50;
+            localStorage.setItem('ref_done', 'true');
+            updateUI();
+        }
     }
 
-    // تشغيل المتجر
     const shop = document.getElementById('shop');
     products.forEach(p => {
         shop.innerHTML += `
@@ -114,10 +119,8 @@
         `;
     });
 
-    // عند التشغيل
-    checkReferral();
+    checkRef();
     updateUI();
-
 </script>
 </body>
 </html>
