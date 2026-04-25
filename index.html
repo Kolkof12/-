@@ -3,190 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WXL-E | متجر الخدمات الرقمية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>WXL-E | Digital Elite Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00ff41; /* لون النينجا الأخضر */
-            --bg-dark: #0a0a0a;
-            --card-bg: #161616;
-            --accent: #ff003c; /* لون التنبيهات والأزرار */
+            --neon-green: #00ff41;
+            --deep-black: #050505;
+            --glass-bg: rgba(20, 20, 20, 0.8);
+            --accent-red: #ff003c;
         }
 
         body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-dark);
-            color: #e0e0e0;
+            font-family: 'Cairo', 'Orbitron', sans-serif;
+            background-color: var(--deep-black);
+            color: #fff;
             margin: 0;
-            padding: 0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* خلفية متحركة خفيفة */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            z-index: -1;
         }
 
         header {
-            background: linear-gradient(135deg, #111, #000);
-            padding: 40px 20px;
+            padding: 60px 20px;
             text-align: center;
-            border-bottom: 2px solid var(--primary);
+            background: linear-gradient(to bottom, #000, transparent);
+            animation: fadeInDown 1s ease;
         }
 
-        .container { max-width: 1100px; margin: auto; padding: 20px; }
+        .neon-text {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 5px;
+        }
 
-        /* الأقسام */
+        .container { max-width: 1200px; margin: auto; padding: 20px; }
+
+        /* لوحة المستخدم المتطورة */
+        .user-dashboard {
+            background: var(--glass-bg);
+            border: 1px solid var(--neon-green);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 50px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-box { text-align: center; }
+        .stat-value { font-size: 2rem; color: var(--neon-green); font-weight: bold; display: block; }
+        .stat-label { font-size: 0.9rem; color: #888; }
+
+        /* المنتجات */
         .section-title {
-            color: var(--primary);
-            border-right: 4px solid var(--primary);
+            font-size: 1.8rem;
+            margin: 40px 0 25px;
+            border-right: 5px solid var(--neon-green);
             padding-right: 15px;
-            margin: 40px 0 20px;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
         }
 
         .card {
-            background: var(--card-bg);
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 20px;
-            transition: 0.3s;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            overflow: hidden;
         }
 
         .card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 255, 65, 0.1);
+            transform: scale(1.05);
+            border-color: var(--neon-green);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
         }
 
-        .price-tag {
-            background: var(--primary);
-            color: #000;
-            padding: 5px 10px;
-            font-weight: bold;
-            border-radius: 5px;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        button {
+        .btn-buy {
             width: 100%;
             padding: 12px;
-            background: none;
-            border: 1px solid var(--primary);
-            color: var(--primary);
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
             font-weight: bold;
             cursor: pointer;
-            margin-top: 15px;
-            border-radius: 5px;
+            margin-top: 20px;
+            border-radius: 8px;
+            transition: 0.3s;
         }
 
-        button:hover {
-            background: var(--primary);
+        .btn-buy:hover {
+            background: var(--neon-green);
             color: #000;
         }
 
-        /* نظام النقاط والإحالة */
-        .referral-box {
-            background: #111;
-            border: 1px dashed var(--primary);
-            padding: 20px;
-            border-radius: 10px;
+        /* الحقوق والتواصل */
+        footer {
             text-align: center;
-            margin-bottom: 30px;
+            padding: 50px;
+            margin-top: 100px;
+            background: #000;
+            border-top: 1px solid #222;
         }
 
-        input {
-            padding: 10px;
-            background: #222;
-            border: 1px solid #444;
-            color: #fff;
-            border-radius: 5px;
-            width: 70%;
-            margin-bottom: 10px;
+        .contact-link {
+            color: var(--neon-green);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>WXL-E DIGITAL STORE</h1>
-    <p>أدوات بايثون، كورسات احترافية، وحسابات مميزة</p>
+    <h1 class="neon-text">WXL-E SYSTEM</h1>
+    <p>الجيل القادم من الخدمات الرقمية والأدوات البرمجية</p>
 </header>
 
 <div class="container">
     
-    <div class="referral-box">
-        <h3>💰 اجمع النقاط مجاناً</h3>
-        <p>سجل إيميلك واحصل على رابط إحالة. كل صديق يسجل عن طريقك يمنحك نقطة واحدة!</p>
-        <input type="email" id="userEmail" placeholder="أدخل إيميلك هنا...">
-        <button onclick="register()" style="width: auto; padding: 10px 30px;">تفعيل الرابط</button>
-        <p id="refLink" style="color: var(--primary); margin-top: 10px; font-weight: bold;"></p>
-    </div>
-
-    <h2 class="section-title">🛠️ الأدوات البرمجية (Python Tools)</h2>
-    <div class="grid" id="tools-grid">
-        <div class="card">
-            <span class="price-tag">150 نقطة</span>
-            <h3>solx_wxle Framework</h3>
-            <p>أقوى أداة OSINT لجمع المعلومات آلياً.</p>
-            <button onclick="buy(1)">شراء الآن</button>
+    <div class="user-dashboard">
+        <div class="stat-box">
+            <span id="pointsValue" class="stat-value">0</span>
+            <span class="stat-label">نقاطك الحالية</span>
         </div>
-        <div class="card">
-            <span class="price-tag">120 نقطة</span>
-            <h3>RSS.DDOS.V3</h3>
-            <p>أداة اختبار ضغط المواقع المتقدمة.</p>
-            <button onclick="buy(2)">شراء الآن</button>
+        
+        <div class="stat-box" style="flex-grow: 1; max-width: 500px;">
+            <input type="email" id="userEmail" placeholder="أدخل إيميلك للبدء..." style="width:80%; padding:10px; background:#000; border:1px solid #444; color:#fff;">
+            <button onclick="initAccount()" style="padding:10px 20px; background:var(--neon-green); border:none; cursor:pointer;">دخول</button>
+            <p id="refLink" style="font-size:0.8rem; margin-top:10px; color:var(--neon-green);"></p>
+        </div>
+
+        <div class="stat-box">
+            <a href="https://t.me/wxl_e" class="contact-link">Contact: @wxl_e</a>
         </div>
     </div>
 
-    <h2 class="section-title">📚 الكورسات التعليمية</h2>
+    <h2 class="section-title">الأدوات الاحترافية (V.IP)</h2>
     <div class="grid">
         <div class="card">
-            <span class="price-tag">500 نقطة</span>
-            <h3>Zero-Day Exploiting</h3>
-            <p>كورس احترافي في ثغرات الصفر.</p>
-            <button onclick="buy(10)">شراء الآن</button>
+            <h3>Solx-X Recon</h3>
+            <p>أداة الاستطلاع الذاتي الأقوى.</p>
+            <span style="color:var(--neon-green)">150 نقطة</span>
+            <button class="btn-buy" onclick="purchase(1)">شراء سريع</button>
         </div>
         <div class="card">
-            <span class="price-tag">400 نقطة</span>
-            <h3>Trading Academy</h3>
-            <p>من الصفر حتى احتراف التداول.</p>
-            <button onclick="buy(11)">شراء الآن</button>
-        </div>
-    </div>
-
-    <h2 class="section-title">👤 حسابات ويوزرات (Accounts)</h2>
-    <div class="grid">
-        <div class="card">
-            <span class="price-tag">50 نقطة</span>
-            <h3>Instagram Account</h3>
-            <p>حسابات قديمة أو يوزرات ثلاثية/رباعية.</p>
-            <button onclick="buy(20)">شراء عشوائي</button>
+            <h3>RSS DDoS V3</h3>
+            <p>اختبار ضغط السيرفرات المتقدم.</p>
+            <span style="color:var(--neon-green)">120 نقطة</span>
+            <button class="btn-buy" onclick="purchase(2)">شراء سريع</button>
         </div>
     </div>
 
 </div>
 
-<script>
-    const API_URL = "https://your-backend-server.com"; // ضع رابط السيرفر هنا
+<footer>
+    <p>© جميع الحقوق محفوظة لـ <span style="color:var(--neon-green)">WXL-E SERVICES</span></p>
+    <p>للتواصل والدعم: <a href="https://t.me/wxl_e" style="color:#fff;">@wxl_e</a></p>
+</footer>
 
-    async function register() {
+<script>
+    // عند تحميل الصفحة، نتحقق من وجود "كود دعوة" في الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const refFromUrl = urlParams.get('ref');
+
+    async function initAccount() {
         const email = document.getElementById('userEmail').value;
-        if(!email) return alert("يرجى إدخال الإيميل");
-        
-        // محاكاة طلب السيرفر
-        const refCode = btoa(email).substring(0, 8); 
-        document.getElementById('refLink').innerText = `رابطك: wxl-store.github.io/?ref=${refCode}`;
-        alert("تم تفعيل حسابك! ابدأ بنشر الرابط لجمع النقاط.");
+        if(!email) return alert("أدخل الإيميل أولاً");
+
+        // استبدل هذا الرابط برابط سيرفر Render الخاص بك
+        const API_URL = "https://your-render-app.onrender.com/api/register";
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: email, ref_by: refFromUrl })
+            });
+            const data = await response.json();
+            
+            // تحديث النقاط ورابط الدعوة في الشاشة
+            document.getElementById('pointsValue').innerText = data.points;
+            const myRefLink = `${window.location.origin}${window.location.pathname}?ref=${data.referral_code}`;
+            document.getElementById('refLink').innerText = "رابط دعوتك: " + myRefLink;
+            
+            alert("تم تسجيل دخولك بنجاح!");
+        } catch (e) {
+            alert("حدث خطأ في الاتصال بالسيرفر");
+        }
     }
 
-    async function buy(id) {
-        const email = prompt("أدخل إيميلك لإتمام عملية الشراء:");
-        if(email) {
-            alert("سيتم التحقق من نقاطك وإرسال المنتج إلى بريدك فوراً.");
-        }
+    function purchase(id) {
+        alert("سيتم التحقق من نقاطك.. يرجى التأكد من تسجيل الدخول أولاً.");
     }
 </script>
 
