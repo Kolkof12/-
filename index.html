@@ -2,247 +2,59 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTINEL-X | @WXL_E</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root { --main: #ff003c; --bg: #050505; --card-bg: #0d0d0d; }
-        .theme-green { --main: #00ff88; }
-        .theme-blue { --main: #00ccff; }
-        .theme-gold { --main: #ffcc00; }
-
-        body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; transition: 0.5s; }
-        .container { max-width: 1100px; margin: auto; padding: 20px; }
-
-        /* Auth Screen */
-        #authScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: var(--card-bg); padding: 40px; border: 2px solid var(--main); border-radius: 20px; text-align: center; width: 320px; box-shadow: 0 0 30px var(--main); }
-
-        /* Master Card Styling */
-        .master-card {
-            background: linear-gradient(135deg, #111 0%, #222 100%);
-            border: 1px solid var(--main);
-            border-radius: 20px;
-            padding: 25px;
-            position: relative;
-            height: 220px;
-            margin-bottom: 30px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            transition: 0.3s;
-        }
-        .master-card::after { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, var(--main) 0%, transparent 70%); opacity: 0.05; pointer-events: none; }
-        
-        .chip { width: 50px; height: 40px; background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%); border-radius: 5px; margin-bottom: 20px; }
-        .card-number { font-family: 'Orbitron'; font-size: 1.4rem; letter-spacing: 3px; margin-bottom: 15px; text-shadow: 0 0 10px var(--main); }
-        .card-info { display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.8rem; }
-
-        /* Theme & Lang Selectors */
-        .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .control-btn { border: 1px solid #333; background: #111; color: #fff; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
-        .control-btn:hover { border-color: var(--main); }
-
-        /* Shop Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .p-card { background: var(--card-bg); border: 1px solid #222; border-radius: 15px; padding: 20px; transition: 0.3s; }
-        .p-card:hover { border-color: var(--main); transform: scale(1.02); }
-        .stars { color: #ffcc00; margin: 10px 0; }
-        
-        .btn { background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; width: 100%; font-family: 'Cairo'; transition: 0.3s; }
-        .btn:hover { opacity: 0.8; box-shadow: 0 0 15px var(--main); }
-
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10001; align-items: center; justify-content: center; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--main); padding: 30px; border-radius: 20px; width: 350px; text-align: center; }
-    </style>
+    <title>WXL_E | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body>
-
-<div id="authScreen">
-    <div class="auth-card">
-        <h1 id="atitle" style="font-family:'Orbitron'; color: var(--main);">SENTINEL-X</h1>
-        <input type="email" id="emailInput" placeholder="Email / الإيميل">
-        <input type="password" id="passInput" placeholder="Password / السر">
-        <button class="btn" onclick="handleAuth()" id="alogin">LOGIN</button>
-    </div>
-</div>
-
-<div class="container">
-    <div class="controls">
-        <select onchange="changeLang(this.value)" class="control-btn">
-            <option value="ar">العربية</option>
-            <option value="en">English</option>
-            <option value="ru">Русский</option>
-        </select>
-        <button class="control-btn" onclick="setTheme('red')" style="color:#ff003c">Red</button>
-        <button class="control-btn" onclick="setTheme('green')" style="color:#00ff88">Green</button>
-        <button class="control-btn" onclick="setTheme('blue')" style="color:#00ccff">Blue</button>
-        <button class="control-btn" onclick="setTheme('gold')" style="color:#ffcc00">Gold</button>
-    </div>
-
-    <div class="master-card" id="mainCard">
-        <div style="display:flex; justify-content: space-between;">
-            <div class="chip"></div>
-            <h2 style="font-family:'Orbitron'; margin:0; color:var(--main); font-size: 1rem;">PREMIUM AGENT</h2>
+<body class="red-theme">
+    <div class="sidebar">
+        <div class="profile">
+            <div class="avatar">🥷</div>
+            <h3>{{ user['username'] }}</h3>
+            <span class="badge">{{ user['role'].upper() }}</span>
         </div>
-        <div class="card-number" id="cardNum">5412 8800 1122 4499</div>
-        <div class="card-info">
-            <div>
-                <small id="l_holder">CARD HOLDER</small><br>
-                <span id="userDisp">AGENT_WXL</span>
-            </div>
-            <div>
-                <small id="l_exp">EXP</small><br>
-                <span>12/29</span>
-            </div>
-            <div>
-                <small>CVV</small><br>
-                <span id="cvvDisp">***</span>
-            </div>
-        </div>
-        <div style="margin-top:20px; font-size: 1.5rem; font-family:'Orbitron'; text-align:right;">
-            <span id="pointsDisp">500</span> <small style="font-size:0.7rem;">PTS</small>
+        <nav>
+            <a href="#" class="active">🏠 المتجر الرئيسي</a>
+            <a href="#">🛡️ كورسات الاختراق</a>
+            <a href="#">📈 أكاديمية التداول</a>
+            <a href="#">💻 دروس البرمجة</a>
+        </nav>
+        <div class="lang-selector">
+            <button onclick="setLang('ar')">AR</button>
+            <button onclick="setLang('en')">EN</button>
+            <button onclick="setLang('fr')">FR</button>
         </div>
     </div>
 
-    <h2 id="l_scripts" style="font-family:'Orbitron'; border-right: 4px solid var(--main); padding-right: 10px;">SCRIPTS & TOOLS</h2>
-    <div class="grid" id="scriptGrid"></div>
-</div>
+    <div class="main">
+        <header>
+            <div class="stats-card">
+                <small>الرصيد الحالي</small>
+                <div class="points">{{ user['points'] }} <span>PTS</span></div>
+            </div>
+            <button class="daily-btn" onclick="claimDaily()">🎁 هدية يومية</button>
+            <div class="theme-dots">
+                <div class="dot red" onclick="setTheme('red')"></div>
+                <div class="dot blue" onclick="setTheme('blue')"></div>
+                <div class="dot green" onclick="setTheme('green')"></div>
+            </div>
+        </header>
 
-<div id="buyModal" class="modal">
-    <div class="modal-content">
-        <h3 id="m_confirm" style="color:var(--main);">تأكيد الشراء</h3>
-        <input type="text" id="botToken" placeholder="Bot Token">
-        <input type="text" id="chatID" placeholder="Chat ID">
-        <input type="password" id="verifyPIN" placeholder="PIN / CVV">
-        <button class="btn" id="confirmBuyBtn">BUY & SEND</button>
-        <button onclick="closeModal()" style="background:none; border:none; color:#555; margin-top:10px; cursor:pointer;">Cancel</button>
+        <section class="grid">
+            {% for tool in tools %}
+            <div class="cyber-card">
+                <div class="card-header">{{ tool.name }}</div>
+                <p>{{ tool.desc }}</p>
+                <div class="price">{{ tool.cost }} PTS</div>
+                <button onclick="location.href='/download/{{ tool.id }}'" class="buy-btn">تحميل الملف .PY</button>
+            </div>
+            {% endfor %}
+        </section>
+
+        <div class="invite-box">
+            <h4>رابط دعوة الأصدقاء (+100 نقطة)</h4>
+            <div class="link">https://wxl-e.com/invite/{{ user['username'] }}</div>
+        </div>
     </div>
-</div>
-
-<script>
-    let user = null;
-    let currentLang = 'ar';
-
-    const translations = {
-        ar: { scripts: "البرمجيات والأدوات", holder: "صاحب البطاقة", exp: "تاريخ", login: "دخول", scripts_data: [
-            {name: "IPGRAM V3", desc: "أداة سحب معلومات الحسابات والـ IP بدقة عالية.", stars: 5},
-            {name: "SOLX OSINT", desc: "نظام البحث المفتوح والاستخبارات الرقمية الشامل.", stars: 4},
-            {name: "CyberShield", desc: "مجموعة أدوات فحص ثغرات المواقع وتشفير البيانات.", stars: 5}
-        ]},
-        en: { scripts: "SCRIPTS & TOOLS", holder: "CARD HOLDER", exp: "EXP", login: "LOGIN", scripts_data: [
-            {name: "IPGRAM V3", desc: "Advanced IG info and IP extraction tool.", stars: 5},
-            {name: "SOLX OSINT", desc: "Complete Open Source Intelligence framework.", stars: 4},
-            {name: "CyberShield", desc: "Vulnerability scanner and data encryption suite.", stars: 5}
-        ]},
-        ru: { scripts: "СКРИПТЫ И ИНСТРУМЕНТЫ", holder: "ВЛАДЕЛЕЦ", exp: "СРОК", login: "ВХОД", scripts_data: [
-            {name: "IPGRAM V3", desc: "Инструмент для извлечения информации об IP.", stars: 5},
-            {name: "SOLX OSINT", desc: "Комплексная система разведки по открытым источникам.", stars: 4},
-            {name: "CyberShield", desc: "Набор инструментов для проверки уязвимостей.", stars: 5}
-        ]}
-    };
-
-    const products = [
-        {id: 1, name: "IPGRAM.py", price: 100, url: "https://raw.githubusercontent.com/wxl-e/tools/main/IPGRAM.py"},
-        {id: 2, name: "solx_wxle.py", price: 250, url: "https://raw.githubusercontent.com/wxl-e/tools/main/solx_wxle.py"},
-        {id: 3, name: "CyberShield.py", price: 150, url: "https://raw.githubusercontent.com/wxl-e/tools/main/password_WXLE_toolkit.py"}
-    ];
-
-    function handleAuth() {
-        const email = document.getElementById('emailInput').value.toLowerCase();
-        const pass = document.getElementById('passInput').value;
-        if(!email || !pass) return alert("Fill data!");
-
-        let saved = JSON.parse(localStorage.getItem('wxl_v3_' + email));
-        user = saved || {
-            email, pass, points: 1000, 
-            cardNum: "5412 " + Math.floor(1000+Math.random()*9000) + " " + Math.floor(1000+Math.random()*9000) + " 4499",
-            cvv: Math.floor(100 + Math.random()*899)
-        };
-        if(saved && saved.pass !== pass) return alert("Wrong password!");
-        localStorage.setItem('wxl_v3_' + email, JSON.stringify(user));
-        document.getElementById('authScreen').style.display = 'none';
-        updateUI();
-    }
-
-    function setTheme(color) {
-        document.body.className = 'theme-' + color;
-    }
-
-    function changeLang(lang) {
-        currentLang = lang;
-        document.getElementById('l_scripts').innerText = translations[lang].scripts;
-        document.getElementById('l_holder').innerText = translations[lang].holder;
-        document.getElementById('l_exp').innerText = translations[lang].exp;
-        renderProducts();
-    }
-
-    function renderProducts() {
-        const grid = document.getElementById('scriptGrid');
-        grid.innerHTML = "";
-        products.forEach((p, index) => {
-            const extra = translations[currentLang].scripts_data[index];
-            let stars = "⭐".repeat(extra.stars);
-            grid.innerHTML += `
-                <div class="p-card">
-                    <h3 style="font-family:'Orbitron'; color:var(--main);">${extra.name}</h3>
-                    <p style="font-size:0.8rem; color:#aaa;">${extra.desc}</p>
-                    <div class="stars">${stars}</div>
-                    <div style="font-weight:bold; margin-bottom:15px;">${p.price} PTS</div>
-                    <button class="btn" onclick="openBuy(${p.id})">PURCHASE</button>
-                </div>`;
-        });
-    }
-
-    function updateUI() {
-        document.getElementById('userDisp').innerText = user.email.split('@')[0].toUpperCase();
-        document.getElementById('pointsDisp').innerText = user.points;
-        document.getElementById('cardNum').innerText = user.cardNum;
-        document.getElementById('cvvDisp').innerText = user.cvv;
-        renderProducts();
-    }
-
-    let activeP = null;
-    function openBuy(id) {
-        activeP = products.find(x => x.id === id);
-        if(user.points < activeP.price) return alert("No enough points!");
-        document.getElementById('buyModal').style.display = 'flex';
-    }
-
-    function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
-
-    document.getElementById('confirmBuyBtn').onclick = async function() {
-        const pin = document.getElementById('verifyPIN').value;
-        const token = document.getElementById('botToken').value;
-        const cid = document.getElementById('chatID').value;
-
-        if(pin != user.cvv) return alert("Wrong CVV!");
-        if(!token || !cid) return alert("Enter Bot Info!");
-
-        try {
-            // حل مشكلة الخطأ: استخدام إرسال رسالة برابط مباشر لضمان وصولها 
-            const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: cid,
-                    text: `🔥 NEW PURCHASE 🔥\n📦 Script: ${activeP.name}\n🔗 Download: ${activeP.url}\n👤 User: ${user.email}\nDev: @WXL_E`
-                })
-            });
-            const resData = await resp.json();
-            if(resData.ok) {
-                user.points -= activeP.price;
-                localStorage.setItem('wxl_v3_' + user.email, JSON.stringify(user));
-                updateUI();
-                alert("SUCCESS! Check Telegram.");
-                closeModal();
-            } else {
-                alert("Telegram Error: Check Bot Token and Chat ID again.");
-            }
-        } catch(e) {
-            alert("Connection Error. Try again.");
-        }
-    };
-</script>
 </body>
 </html>
