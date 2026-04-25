@@ -6,132 +6,175 @@
     <title>SENTINEL-X | @WXL_E</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00ff41; --bg: #020202; }
-        body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; }
-        .container { max-width: 1100px; margin: auto; padding: 20px; }
-        .sentinel-card {
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px);
-            border: 1px solid var(--neon); border-radius: 20px;
-            padding: 25px; width: 320px; margin: 20px auto; position: relative;
-        }
-        .pin-box { color: #ff003c; font-weight: bold; font-family: 'Orbitron'; }
+        :root { --main: #ff003c; --bg: #050505; --card: #0d0d0d; }
+        body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
+        body::before { content: ""; position: fixed; inset: 0; background: linear-gradient(rgba(255,0,60,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,0,60,0.02) 1px, transparent 1px); background-size: 30px 30px; z-index: -1; }
+
+        #authScreen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: var(--card); padding: 40px; border: 2px solid var(--main); border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 0 30px rgba(255,0,60,0.2); }
+        
+        .container { max-width: 1200px; margin: auto; padding: 20px; }
+        .ninja-card { background: linear-gradient(135deg, #0a0a0a 0%, #1a0005 100%); border: 1px solid var(--main); border-radius: 20px; padding: 30px; position: relative; margin-bottom: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+
+        .section-title { font-family: 'Orbitron'; color: var(--main); border-right: 4px solid var(--main); padding-right: 15px; margin: 40px 0 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .product-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden; text-align: center; padding: 15px; }
-        .main-btn { background: var(--neon); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: 900; cursor: pointer; width: 100%; margin-top: 10px; font-family: 'Cairo'; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; }
-        .modal-content { background: #0d0d0d; width: 85%; max-width: 380px; margin: 60px auto; padding: 25px; border: 1px solid var(--neon); border-radius: 15px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        .p-card { background: var(--card); border: 1px solid #222; border-radius: 15px; overflow: hidden; transition: 0.3s; }
+        .p-card:hover { border-color: var(--main); transform: translateY(-5px); }
+        .p-content { padding: 20px; text-align: center; }
+        
+        .btn { background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; font-family: 'Cairo'; width: 100%; transition: 0.3s; }
+        .btn:hover { background: #fff; color: var(--main); box-shadow: 0 0 20px var(--main); }
+        
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; }
+        .modal-content { background: var(--card); border: 1px solid var(--main); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header style="text-align: center;">
-        <h1 style="font-family: 'Orbitron';">SENTINEL<span style="color: var(--neon);">-X</span></h1>
-        <p style="color: #888;">DEVELOPED BY @WXL_E</p>
-    </header>
-
-    <div class="sentinel-card">
-        <div style="font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon);">CARD HOLDER: <span id="cardEmail" style="color:#fff"></span></div>
-        <div style="margin: 15px 0;">
-            <small style="color:#666">SECURITY PIN (مهم للشراء)</small><br>
-            <span id="cardPIN" class="pin-box"></span>
-        </div>
-        <div style="font-size: 2.5rem; font-weight: 900; text-align: center;" id="cardPoints">0</div>
-        <center><small style="color: var(--neon);">CREDITS</small></center>
+<div id="authScreen">
+    <div class="auth-card">
+        <h1 style="font-family:'Orbitron'; color: var(--main);">SENTINEL LOGIN</h1>
+        <input type="email" id="emailInput" placeholder="الإيميل">
+        <input type="password" id="passInput" placeholder="كلمة المرور">
+        <button class="btn" onclick="handleAuth()">دخول النظام</button>
     </div>
-
-    <div class="grid" id="productGrid"></div>
 </div>
 
-<div id="paymentModal" class="modal">
+<div class="container">
+    <header style="text-align: center;">
+        <h1 style="font-family: 'Orbitron'; font-size: 2.5rem; margin: 0;">SENTINEL<span style="color: var(--main);">-X</span></h1>
+        <p style="color: #666;">OWNED BY @WXL_E | V2.0 PREMIUM</p>
+    </header>
+
+    <div class="ninja-card">
+        <div style="display: flex; justify-content: space-between;">
+            <span id="userDisp" style="font-family:'Orbitron'; color: var(--main);">GUEST</span>
+            <span id="pinDisp" style="color: var(--main); font-weight: bold;">PIN: ----</span>
+        </div>
+        <div style="font-size: 3rem; text-align: center; font-family:'Orbitron';" id="pointsDisp">000</div>
+        <center><small>CREDITS</small></center>
+        <button class="btn" style="margin-top: 15px; width: auto; display: block; margin-left: auto; margin-right: auto;" onclick="claimDaily()">🎁 استلام المنحة</button>
+    </div>
+
+    <h2 class="section-title">PYTHON SCRIPTS (.PY)</h2>
+    <div class="grid" id="scriptGrid"></div>
+
+    <h2 class="section-title">INSTAGRAM ACCOUNTS (WITH EMAIL)</h2>
+    <div class="grid" id="instaGrid"></div>
+
+    <h2 class="section-title">PREMIUM COURSES</h2>
+    <div class="grid" id="courseGrid"></div>
+</div>
+
+<div id="buyModal" class="modal">
     <div class="modal-content">
-        <h3 style="color: var(--neon);">تأكيد الدفع والاستلام</h3>
+        <h3 id="modalTitle" style="color: var(--main);">تأكيد الطلب</h3>
         <input type="text" id="botToken" placeholder="Bot Token">
         <input type="text" id="chatID" placeholder="Chat ID">
-        <input type="password" id="checkPIN" placeholder="أدخل PIN البطاقة (الأحمر)">
-        <button class="main-btn" id="finalBuyBtn">شراء وإرسال الملف فوراً</button>
-        <button onclick="closeModal()" style="background:none; color:#555; border:none; cursor:pointer; margin-top:10px;">إلغاء</button>
+        <input type="password" id="verifyPIN" placeholder="أدخل PIN البطاقة">
+        <button class="btn" id="confirmBuyBtn">إرسال المنتج الآن</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:#555; margin-top:10px; cursor:pointer;">إلغاء</button>
     </div>
 </div>
 
 <script>
-    let user = JSON.parse(localStorage.getItem('sentinel_v5')) || {
-        email: (prompt("أدخل إيميلك:") || "GUEST").toUpperCase(),
-        pin: Math.floor(1000 + Math.random() * 9000),
-        points: 500, daily: 0
+    let user = null;
+    const products = {
+        scripts: [
+            { name: "IPGRAM.py", price: 100, url: "IPGRAM.py", type: "file" },
+            { name: "BLAK WINDOW.py", price: 150, url: "BLAK WINDOW.py", type: "file" },
+            { name: "solx_wxle.py", price: 300, url: "solx_wxle.py", type: "file" },
+            { name: "RSS.DDOS.V3.py", price: 200, url: "RSS.DDOS.V3.py", type: "file" },
+            { name: "WebAnalyzer Pro.py", price: 180, url: "WebAnalyzer Pro v1.4.RUSS.py", type: "file" },
+            { name: "CyberShield Toolkit.py", price: 250, url: "password_WXLE_toolkit.py", type: "file" }
+        ],
+        accounts: [
+            { name: "Insta Account (5k)", price: 500, info: "User: [REDACTED] | Mail: [REDACTED]", type: "text" },
+            { name: "Insta Account (10k)", price: 900, info: "User: [REDACTED] | Mail: [REDACTED]", type: "text" }
+        ],
+        courses: [
+            { name: "كورس الاختراق الاحترافي", price: 800, url: "https://mega.nz/...", type: "link" },
+            { name: "كورس التداول من 0", price: 1000, url: "https://mega.nz/...", type: "link" }
+        ]
     };
-    localStorage.setItem('sentinel_v5', JSON.stringify(user));
+
+    function handleAuth() {
+        const email = document.getElementById('emailInput').value.toLowerCase();
+        const pass = document.getElementById('passInput').value;
+        if(!email || !pass) return alert("أدخل البيانات!");
+        let saved = JSON.parse(localStorage.getItem('wxl_v2_' + email));
+        user = saved || { email, pass, points: 500, pin: Math.floor(1000 + Math.random()*9000), daily: 0 };
+        if(saved && saved.pass !== pass) return alert("الباسورد خطأ!");
+        localStorage.setItem('wxl_v2_' + email, JSON.stringify(user));
+        document.getElementById('authScreen').style.display = 'none';
+        updateUI();
+    }
 
     function updateUI() {
-        document.getElementById('cardEmail').innerText = user.email;
-        document.getElementById('cardPIN').innerText = user.pin;
-        document.getElementById('cardPoints').innerText = user.points;
+        document.getElementById('userDisp').innerText = user.email.split('@')[0].toUpperCase();
+        document.getElementById('pointsDisp').innerText = user.points;
+        document.getElementById('pinDisp').innerText = "PIN: " + user.pin;
     }
-
-    // هنا تضع روابط الملفات الحقيقية المرفوعة على GitHub Raw مثلاً
-    const products = [
-        {id:1, name:"IPGRAM.py", price:100, fileUrl:"https://raw.githubusercontent.com/YourUser/YourRepo/main/IPGRAM.py"},
-        {id:2, name:"solx_wxle.py", price:250, fileUrl:"https://raw.githubusercontent.com/YourUser/YourRepo/main/solx_wxle.py"},
-        {id:3, name:"RSS.DDOS.V3.py", price:150, fileUrl:"https://raw.githubusercontent.com/YourUser/YourRepo/main/RSS.DDOS.V3.py"},
-        {id:4, name:"كورس الاختراق", price:400, fileUrl:"https://your-link.com/hacking-course.zip"}
-    ];
 
     let activeP = null;
-    function openBuy(id) {
-        activeP = products.find(p => p.id === id);
-        if(user.points < activeP.price) return alert("نقاطك لا تكفي!");
-        document.getElementById('paymentModal').style.display = "block";
+    function openBuy(p) {
+        if(user.points < p.price) return alert("نقاطك لا تكفي!");
+        activeP = p;
+        document.getElementById('modalTitle').innerText = "شراء: " + p.name;
+        document.getElementById('buyModal').style.display = 'flex';
     }
 
-    function closeModal() { document.getElementById('paymentModal').style.display = "none"; }
+    function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
 
-    document.getElementById('finalBuyBtn').onclick = async function() {
-        const pin = document.getElementById('checkPIN').value;
+    document.getElementById('confirmBuyBtn').onclick = async function() {
+        const pin = document.getElementById('verifyPIN').value;
         const token = document.getElementById('botToken').value;
         const cid = document.getElementById('chatID').value;
-        
-        if(pin != user.pin) return alert("PIN خاطئ!");
 
-        user.points -= activeP.price;
-        localStorage.setItem('sentinel_v5', JSON.stringify(user));
-        updateUI();
-
-        // التعديل السحري: إرسال الملف كـ Document وليس كرسالة نصية
-        const sendFileUrl = `https://api.telegram.org/bot${token}/sendDocument`;
+        if(pin != user.pin) return alert("PIN خطأ!");
         
+        let method = activeP.type === "file" ? "sendDocument" : "sendMessage";
+        let payloadKey = activeP.type === "file" ? "document" : "text";
+        let content = activeP.type === "text" ? `📦 بيانات الحساب:\n${activeP.info}` : activeP.url;
+
         try {
-            const response = await fetch(sendFileUrl, {
+            const resp = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     chat_id: cid,
-                    document: activeP.fileUrl,
-                    caption: `🔥 تم شراء ملف جاهز من SENTINEL-X\n📦 المنتج: ${activeP.name}\n👤 المشتري: ${user.email}\nحقوق المطور: @WXL_E`
+                    [payloadKey]: content,
+                    caption: `✅ تم شراء ${activeP.name}\nالمشتري: ${user.email}\nالمطور: @WXL_E`
                 })
             });
-
-            const result = await response.json();
-            if(result.ok) {
-                alert("✅ مبروك! الملف وصلك الآن في البوت كملف جاهز للتشغيل.");
+            if((await resp.json()).ok) {
+                user.points -= activeP.price;
+                localStorage.setItem('wxl_v2_' + user.email, JSON.stringify(user));
+                updateUI();
+                alert("✅ تم الإرسال بنجاح!");
                 closeModal();
-            } else {
-                alert("خطأ: تأكد من أن رابط الملف مباشر وصحيح.");
-            }
-        } catch(e) { alert("خطأ في الاتصال بالبوت."); }
+            } else { alert("خطأ في بيانات البوت!"); }
+        } catch(e) { alert("خطأ في الاتصال."); }
+    };
+
+    function render(target, data) {
+        const el = document.getElementById(target);
+        data.forEach(p => {
+            el.innerHTML += `<div class="p-card"><div class="p-content"><h3>${p.name}</h3><p style="color:var(--main)">${p.price} PTS</p><button class="btn" onclick='openBuy(${JSON.stringify(p)})'>شراء الآن</button></div></div>`;
+        });
     }
 
-    const grid = document.getElementById('productGrid');
-    products.forEach(p => {
-        grid.innerHTML += `
-            <div class="product-card">
-                <h3>${p.name}</h3>
-                <div style="color:var(--neon)">${p.price} PTS</div>
-                <button class="main-btn" onclick="openBuy(${p.id})">شراء واستلام الملف</button>
-            </div>`;
-    });
+    render('scriptGrid', products.scripts);
+    render('instaGrid', products.accounts);
+    render('courseGrid', products.courses);
 
-    updateUI();
+    function claimDaily() {
+        if(Date.now() - user.daily < 86400000) return alert("عد غداً!");
+        user.points += 200; user.daily = Date.now();
+        localStorage.setItem('wxl_v2_' + user.email, JSON.stringify(user));
+        updateUI(); alert("تمت إضافة 200 نقطة!");
+    }
 </script>
 </body>
 </html>
