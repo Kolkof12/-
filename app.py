@@ -1,69 +1,89 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
+import os
 
 app = Flask(__name__)
-app.secret_key = "wxl_e_secret"
+app.secret_key = "wxl_e_secure_key" # مفتاح لتأمين الجلسات
 
-# إنشاء قاعدة البيانات
+# إنشاء قاعدة البيانات والجداول إذا لم تكن موجودة
 def init_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users 
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, points INTEGER, referred_by INTEGER)''')
+    conn = sqlite3.connect('users_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE,
+            points INTEGER DEFAULT 0
+        )
+    ''')
     conn.commit()
     conn.close()
 
 @app.route('/')
-def index():
-    # الحصول على ID الشخص اللي استدعى (من الرابط)
-    ref = request.args.get('ref')
-    if ref:
-        session['ref_id'] = ref
-    return "<h1>مرحباً بك في منصة WXL-E للتبادل</h1><p>سجل الآن للحصول على 50 نقطة!</p><a href='/register'>تسجيل</a>"
+def home():
+    # التقاط الـ ID الخاص بالداعي من الرابط (مثال: site.com/?ref=1)
+    ref_id = request.args.get('ref')
+    if ref_id:
+        session['referrer'] = ref_id
+    return "<h1>مرحباً بك في المنصة</h1><a href='/register'>سجل الآن واحصل على 50 نقطة</a>"
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        email = request.form['email']
-        conn = sqlite3.connect('database.db')
-        c = conn.cursor()
+        user_name = request.form['username']
         
-        # إضافة المستخدم الجديد بـ 50 نقطة
-        c.execute("INSERT INTO users (email, points) VALUES (?, ?)", (email, 50))
-        new_user_id = c.lastrowid
+        conn = sqlite3.connect('users_data.db')
+        cursor = conn.cursor()
         
-        # إذا سجل عن طريق رابط دعوة، نزيد 50 نقطة لصاحب الرابط
-        if 'ref_id' in session:
-            inviter_id = session['ref_id']
-            c.execute("UPDATE users SET points = points + 50 WHERE id = ?", (inviter_id,))
-            session.pop('ref_id') # حذف الـ ID من الجلسة بعد الاستعمال
+        try:
+            # 1. إضافة المستخدم الجديد مع 50 نقطة هدية ترحيبية
+            cursor.execute("INSERT INTO users (username, points) VALUES (?, ?)", (user_name, 50))
+            new_user_id = cursor.lastrowid
             
-        conn.commit()
-        conn.close()
-        return redirect(url_for('dashboard', user_id=new_user_id))
-    
-    return '''<form method="post">الإيميل: <input type="email" name="email"><input type="submit" value="ابدأ"></form>'''
+            # 2. التحقق إذا كان هناك "داعي" لهذا المستخدم
+            if 'referrer' in session:
+                inviter_id = session['referrer']
+                # إضافة 50 نقطة للشخص الذي أرسل الرابط
+                cursor.execute("UPDATE users SET points = points + 50 WHERE id = ?", (inviter_id,))
+                session.pop('referrer') # تنظيف الجلسة
+                
+            conn.commit()
+            return redirect(url_for('dashboard', uid=new_user_id))
+        except sqlite3.IntegrityError:
+            return "الإسم مستخدم بالفعل، اختر اسماً آخر."
+        finally:
+            conn.close()
+            
+    return '''
+        <form method="post">
+            <input type="text" name="username" placeholder="اختر اسم مستخدم" required>
+            <button type="submit">إنشاء حساب</button>
+        </form>
+    '''
 
-@app.route('/dashboard/<int:user_id>')
-def dashboard(user_id):
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    user = c.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+@app.route('/dashboard/<int:uid>')
+def dashboard(uid):
+    conn = sqlite3.connect('users_data.db')
+    cursor = conn.cursor()
+    user = cursor.execute("SELECT * FROM users WHERE id = ?", (uid,)).fetchone()
     conn.close()
     
     if user:
-        # رابط الدعوة الخاص بالمستخدم
-        invite_link = f"{request.host_url}?ref={user[0]}"
+        # إنشاء رابط الدعوة الخاص بهذا المستخدم
+        my_ref_link = f"{request.host_url}?ref={user[0]}"
         return f'''
-        <h2>لوحة التحكم</h2>
-        <p>الإيميل: {user[1]}</p>
-        <p style="color:green; font-weight:bold;">رصيد نقاطك: {user[2]}</p>
-        <hr>
-        <p>رابط الدعوة الخاص بك (ارسله لتربح 50 نقطة عن كل شخص):</p>
-        <input type="text" value="{invite_link}" readonly style="width:300px;">
+            <div style="text-align:center; margin-top:50px; font-family:Arial;">
+                <h2>لوحة التحكم: {user[1]}</h2>
+                <h3 style="color:green;">رصيدك الحالي: {user[2]} نقطة</h3>
+                <hr>
+                <p>شارك هذا الرابط لتربح 50 نقطة عن كل صديق يسجل:</p>
+                <input type="text" value="{my_ref_link}" readonly style="width:300px; padding:10px;">
+                <br><br>
+                <button>تصفح الحسابات والكورسات</button>
+            </div>
         '''
-    return "خطأ في المستخدم"
+    return "المستخدم غير موجود"
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
