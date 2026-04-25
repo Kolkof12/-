@@ -1,44 +1,218 @@
-// 1. استخراج كود الدعوة من الرابط تلقائياً
-const urlParams = new URLSearchParams(window.location.search);
-const refFromUrl = urlParams.get('ref'); 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WXL-E | النخبة الرقمية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00ff41; /* أخضر نيون */
+            --bg: #050505;
+            --card: #111111;
+        }
 
-// 2. دالة تسجيل الدخول وجلب النقاط
-async function initAccount() {
-    const email = document.getElementById('userEmail').value;
-    if(!email) return alert("يرجى إدخال بريدك الإلكتروني");
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg);
+            color: #fff;
+            margin: 0;
+            line-height: 1.6;
+        }
 
-    // ملاحظة: استبدل الرابط أدناه برابط Render الخاص بك
-    const API_URL = "https://your-app-name.onrender.com/api/register";
+        /* تصميم الهيدر المتحرك */
+        header {
+            padding: 80px 20px;
+            text-align: center;
+            background: radial-gradient(circle, #111 0%, #000 100%);
+            border-bottom: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+        }
 
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                email: email, 
-                ref_by: refFromUrl // يرسل كود الشخص الذي دعاه (إن وجد)
-            })
-        });
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            margin: 0;
+            letter-spacing: 10px;
+        }
 
-        if (!response.ok) throw new Error('خطأ في استجابة السيرفر');
+        .container { max-width: 1100px; margin: auto; padding: 20px; }
 
-        const data = await response.json();
+        /* لوحة النقاط الحديثة */
+        .points-dashboard {
+            background: var(--card);
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin: -50px auto 50px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
 
-        // تحديث واجهة المستخدم بالنقاط ورابط الدعوة الجديد
-        document.getElementById('pointsValue').innerText = data.points;
+        .points-dashboard:hover { transform: translateY(-5px); }
+
+        .points-count {
+            font-size: 4rem;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            display: block;
+        }
+
+        /* حقول الإدخال */
+        input[type="email"] {
+            width: 80%;
+            max-width: 400px;
+            padding: 15px;
+            border-radius: 30px;
+            border: 1px solid #333;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-main {
+            background: var(--primary);
+            color: #000;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-main:hover { box-shadow: 0 0 20px var(--primary); transform: scale(1.05); }
+
+        /* روابط الدعوة */
+        #refBox {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            display: none;
+        }
+
+        /* شبكة المنتجات */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #222;
+            transition: 0.4s;
+            text-align: center;
+        }
+
+        .card:hover { border-color: var(--primary); }
+
+        .price { color: var(--primary); font-weight: bold; font-size: 1.2rem; }
+
+        footer {
+            text-align: center;
+            padding: 60px;
+            border-top: 1px solid #222;
+            margin-top: 50px;
+        }
+
+        .contact-btn {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 class="logo">WXL-E</h1>
+    <p>الأدوات البرمجية والأكاديمية الخاصة</p>
+</header>
+
+<div class="container">
+    <div class="points-dashboard">
+        <span class="stat-label">رصيد نقاطك</span>
+        <span id="pointsDisplay" class="points-count">0</span>
         
-        // بناء رابط الدعوة الخاص بالمستخدم الجديد
-        const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-        const myFullRefLink = `${baseUrl}?ref=${data.referral_code}`;
-        
-        document.getElementById('refLink').innerHTML = `
-            رابط دعوتك (انسخه وانشره): <br>
-            <strong style="color:#00ff41; word-break: break-all;">${myFullRefLink}</strong>
-        `;
-        
-        alert("مرحباً بك! تم تحديث نقاطك وبياناتك.");
-    } catch (error) {
-        console.error("Error:", error);
-        alert("فشل الاتصال بالسيرفر. تأكد من تشغيل الـ Backend وصحة الرابط.");
+        <input type="email" id="emailInput" placeholder="أدخل إيميلك للمتابعة">
+        <br>
+        <button class="btn-main" onclick="syncData()">دخول / تحديث</button>
+
+        <div id="refBox">
+            <p>انشر هذا الرابط لزيادة نقاطك:</p>
+            <strong id="refLink" style="color: var(--primary); word-break: break-all;"></strong>
+        </div>
+    </div>
+
+    <h2 style="border-right: 4px solid var(--primary); padding-right: 15px;">المتجر الحصري</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>أكاديمية التداول (0-100)</h3>
+            <p class="price">400 نقطة</p>
+            <button class="btn-main" style="padding: 10px 20px;">شراء</button>
+        </div>
+        <div class="card">
+            <h3>RSS.DDOS.V3</h3>
+            <p class="price">120 نقطة</p>
+            <button class="btn-main" style="padding: 10px 20px;">شراء</button>
+        </div>
+        <div class="card">
+            <h3>solx_wxle Framework</h3>
+            <p class="price">150 نقطة</p>
+            <button class="btn-main" style="padding: 10px 20px;">شراء</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>للتواصل المباشر والاستفسارات:</p>
+    <a href="https://t.me/wxl_e" class="contact-btn">@wxl_e</a>
+    <p style="margin-top: 20px; color: #555;">© 2026 WXL-E SERVICES. All Rights Reserved.</p>
+</footer>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const referrer = urlParams.get('ref');
+
+    async function syncData() {
+        const email = document.getElementById('emailInput').value;
+        if(!email) return alert("يرجى كتابة الإيميل");
+
+        // استبدل الرابط أدناه برابط سيرفر Render الخاص بك
+        const API_URL = "https://your-app.onrender.com/api/register";
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, ref_by: referrer })
+            });
+            const data = await response.json();
+
+            // تحديث العرض
+            document.getElementById('pointsDisplay').innerText = data.points;
+            
+            const fullLink = window.location.origin + window.location.pathname + "?ref=" + data.referral_code;
+            document.getElementById('refLink').innerText = fullLink;
+            document.getElementById('refBox').style.display = "block";
+
+            alert("تم التحديث بنجاح!");
+        } catch (err) {
+            alert("خطأ في الاتصال بالسيرفر. تأكد من صحة الرابط.");
+        }
     }
-}
+</script>
+
+</body>
+</html>
