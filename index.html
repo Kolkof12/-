@@ -3,115 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WXL-E | Digital Store</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>SENTINEL-X | WXL-E ELITE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00ff41; --bg: #050505; --panel: #0f0f0f; }
-        body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin:0; }
-        .glitch-title { font-family: 'Orbitron'; font-size: 3rem; text-align: center; color: var(--neon); text-shadow: 0 0 15px var(--neon); margin: 30px 0; }
-        .container { max-width: 1000px; margin: auto; padding: 20px; }
+        :root { --neon: #00ff41; --dark: #020202; --card: #0a0a0a; }
+        body { background: var(--dark); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
         
-        .status-card {
-            background: var(--panel); border: 1px solid var(--neon); border-radius: 15px;
-            padding: 30px; text-align: center; margin-bottom: 40px; box-shadow: 0 0 20px rgba(0,255,65,0.1);
+        /* تأثير الجليتش للعنوان */
+        .glitch-text { font-family: 'Orbitron'; font-size: 3.5rem; color: var(--neon); text-shadow: 0 0 15px var(--neon); text-align: center; margin: 40px 0; letter-spacing: 5px; }
+        
+        .container { max-width: 1100px; margin: auto; padding: 20px; }
+        
+        .main-dash {
+            background: var(--card); border: 2px solid var(--neon); border-radius: 20px;
+            padding: 40px; text-align: center; box-shadow: 0 0 40px rgba(0,255,65,0.1);
+            position: relative; margin-bottom: 50px;
         }
-        .points-val { font-family: 'Orbitron'; font-size: 4rem; color: var(--neon); display: block; }
+
+        .points-display { font-family: 'Orbitron'; font-size: 5rem; color: var(--neon); line-height: 1; margin: 20px 0; }
         
-        input { background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 25px; width: 80%; max-width: 350px; text-align: center; margin: 15px 0; }
-        .btn-glow { background: var(--neon); color: #000; padding: 12px 30px; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-glow:hover { box-shadow: 0 0 20px var(--neon); transform: translateY(-2px); }
+        input { background: #000; border: 1px solid #333; color: var(--neon); padding: 15px 30px; border-radius: 50px; width: 80%; max-width: 400px; text-align: center; margin-bottom: 20px; font-weight: bold; }
+        
+        .btn { background: var(--neon); color: #000; font-weight: 900; padding: 15px 45px; border-radius: 50px; border: none; cursor: pointer; transition: 0.4s; text-transform: uppercase; margin: 5px; }
+        .btn:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--neon); }
+        .btn-daily { background: #fff; color: #000; border: 2px solid var(--neon); }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .item-card { background: var(--panel); padding: 20px; border-radius: 12px; border: 1px solid #222; text-align: center; transition: 0.3s; }
-        .item-card:hover { border-color: var(--neon); }
-        .price-tag { color: var(--neon); font-family: 'Orbitron'; display: block; margin: 10px 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .card { background: #080808; border-radius: 15px; padding: 30px; border: 1px solid #1a1a1a; transition: 0.5s; text-align: center; position: relative; }
+        .card:hover { border-color: var(--neon); transform: translateY(-10px); background: #0d0d0d; }
+        .card h3 { font-family: 'Orbitron'; color: #fff; margin-bottom: 10px; }
+        .price { color: var(--neon); font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; display: block; }
 
-        footer { text-align: center; padding: 50px; border-top: 1px solid #111; margin-top: 50px; }
-        .dev-link { color: var(--neon); text-decoration: none; font-family: 'Orbitron'; font-size: 1.2rem; }
+        .ref-box { background: #000; border-radius: 10px; padding: 15px; margin-top: 20px; display: none; border: 1px dashed var(--neon); }
+
+        footer { text-align: center; padding: 60px; border-top: 1px solid #111; margin-top: 100px; }
+        .footer-link { color: var(--neon); text-decoration: none; font-family: 'Orbitron'; font-size: 1.5rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 class="glitch-title">WXL-E SYSTEM</h1>
+    <h1 class="glitch-text">SENTINEL-X</h1>
 
-    <div class="status-card">
-        <span style="font-size: 0.9rem; color: #888;">CURRENT BALANCE</span>
-        <span id="pDisp" class="points-val">0</span>
+    <div class="main-dash">
+        <p style="color: #666; font-weight: bold;">TOTAL CREDITS</p>
+        <div class="points-display" id="pts">0000</div>
         
-        <input type="email" id="uEmail" placeholder="ENTER YOUR EMAIL">
+        <input type="email" id="email" placeholder="ENTER YOUR ENCRYPTED EMAIL">
         <br>
-        <button class="btn-glow" onclick="sync()">SYNC & REFRESH</button>
+        <button class="btn" onclick="sync()">SYNC SYSTEM</button>
+        <button class="btn btn-daily" onclick="claimDaily()">🎁 DAILY 150 PTS</button>
 
-        <div id="refSection" style="display:none; margin-top: 20px; padding: 10px; background: #000; border-radius: 10px;">
-            <p style="font-size: 0.8rem; color: #555;">SHARE THIS LINK TO GET +5 POINTS:</p>
-            <code id="refLink" style="color: var(--neon); word-break: break-all;"></code>
+        <div id="refBox" class="ref-box">
+            <p style="font-size: 12px; color: #555;">INVITE LINK (50 PTS PER REFERRAL):</p>
+            <code id="refLink" style="color: var(--neon); font-size: 14px;"></code>
         </div>
     </div>
 
-    <h2 style="color: var(--neon); margin-bottom: 25px;">AVAILABLE ASSETS</h2>
+    <h2 style="color: var(--neon); border-right: 5px solid var(--neon); padding-right: 15px; margin-bottom: 30px;">EXPLOITS & ACADEMY</h2>
     <div class="grid" id="shop"></div>
 </div>
 
 <footer>
-    <p>DEVELOPED BY: <a href="https://t.me/wxl_e" class="dev-link">@wxl_e</a></p>
+    <p>SECURED BY:</p>
+    <a href="https://t.me/wxl_e" class="footer-link">@wxl_e</a>
+    <p style="margin-top: 20px; font-size: 10px; color: #222;">© 2026 WXL-E SERVICES. ALL RIGHTS RESERVED.</p>
 </footer>
 
 <script>
-    // هام جداً: ضع رابط Render الخاص بك هنا
-    const API_BASE = "https://wxl-e-store.onrender.com"; 
+    const API = "https://your-app-name.onrender.com"; // ضع رابط RENDER هنا
 
-    const products = [
-        {id:1, n:"solx_wxle Framework", p:150},
-        {id:2, n:"RSS.DDOS.V3", p:120},
-        {id:3, n:"CyberShield Toolkit", p:100},
-        {id:6, n:"Zero-Day Exploit Course", p:500},
-        {id:7, n:"Trading Academy Pro", p:400},
-        {id:5, n:"IPGRAM Extractor", p:60}
+    const items = [
+        {id: 1, n: "solx_wxle Framework", p: 150},
+        {id: 5, n: "IPGRAM Extractor", p: 60},
+        {id: 2, n: "RSS.DDOS.V3", p: 120},
+        {id: 7, n: "Trading Academy Pro", p: 400},
+        {id: 3, n: "CyberShield Toolkit", p: 100},
+        {id: 6, n: "Zero-Day Exploit Course", p: 500}
     ];
 
     const shop = document.getElementById('shop');
-    products.forEach(x => {
+    items.forEach(i => {
         shop.innerHTML += `
-            <div class="item-card">
-                <h3>${x.n}</h3>
-                <span class="price-tag">${x.p} PTS</span>
-                <button class="btn-glow" style="width:100%" onclick="buy(${x.id})">PURCHASE</button>
+            <div class="card">
+                <h3>${i.n}</h3>
+                <span class="price">${i.p} PTS</span>
+                <button class="btn" style="width:100%" onclick="buy(${i.id})">ACCESS NOW</button>
             </div>
         `;
     });
 
     async function sync() {
-        const email = document.getElementById('uEmail').value;
+        const email = document.getElementById('email').value;
         const ref = new URLSearchParams(window.location.search).get('ref');
-        if(!email) return alert("Enter Email!");
+        if(!email) return alert("Email Required!");
 
-        try {
-            const r = await fetch(`${API_BASE}/api/sync`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email, ref_by: ref})
-            });
-            const d = await r.json();
-            document.getElementById('pDisp').innerText = d.points;
-            document.getElementById('refLink').innerText = window.location.origin + window.location.pathname + "?ref=" + d.ref;
-            document.getElementById('refSection').style.display = "block";
-            alert("Data Synced Successfully!");
-        } catch(e) { alert("Server Connection Failed!"); }
+        const res = await fetch(`${API}/api/sync`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email, ref_by: ref})
+        });
+        const data = await res.json();
+        document.getElementById('pts').innerText = data.points;
+        document.getElementById('refLink').innerText = window.location.origin + window.location.pathname + "?ref=" + data.ref;
+        document.getElementById('refBox').style.display = "block";
+    }
+
+    async function claimDaily() {
+        const email = document.getElementById('email').value;
+        if(!email) return alert("Sync your email first!");
+        const res = await fetch(`${API}/api/daily`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email})
+        });
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('pts').innerText = data.points;
+            alert("مبروك! استلمت 150 نقطة.");
+        } else alert(data.msg);
     }
 
     async function buy(id) {
-        const email = document.getElementById('uEmail').value;
-        if(!email) return alert("Login first!");
-
-        const r = await fetch(`${API_BASE}/api/buy`, {
+        const email = document.getElementById('email').value;
+        if(!email) return alert("Sync first!");
+        const res = await fetch(`${API}/api/buy`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email, p_id: id})
         });
-        const d = await r.json();
-        if(d.success) alert("SUCCESS! Product Key: " + d.data);
-        else alert("ERROR: " + d.msg);
+        const data = await res.json();
+        if(data.success) alert("SUCCESS! KEY: " + data.key);
+        else alert(data.msg);
     }
 </script>
 </body>
